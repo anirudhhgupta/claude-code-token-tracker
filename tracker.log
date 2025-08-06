@@ -1,0 +1,29 @@
+🔍 Monitoring Claude config at: /Users/anirudhgupta/.claude.json
+📁 Auto-discovering projects in: /Users/anirudhgupta/Code
+🔍 Discovered 10 projects in Code folder
+📋 Registered project: audio_song_matcher
+📋 Registered project: cursor.sh
+📋 Registered project: notion-duplicator-extension copy
+📋 Registered project: super-agent-pro-landing-page
+📋 Registered project: zerodha-mcp
+📋 Registered project: anirudhgupta
+✅ Token tracker started successfully
+📊 Use "npm run report" to view token usage
+📝 Claude config changed, processing...
+📋 Registered project: anirudhgupta
+🔍 Robust tracking of: /Users/anirudhgupta/.claude.json
+⚡ Using aggressive polling with error recovery
+📋 Initial state captured for notion-duplicator-extension
+   Session: 953809ed...
+   Tokens: 10871/27937/182349
+📋 Initial state captured for claude-token-tracker
+   Session: b55aa152...
+   Tokens: 17015/1647/97353
+📋 Initial state captured for slack-scrape-automation
+   Session: 908e9e6b...
+   Tokens: 5358/1872/50423
+📋 Initial state captured for anushka-mock-interview
+   Session: c2e6c68e...
+   Tokens: 3/25/14359
+✅ Robust token tracker started
+📊 Every token change will be tracked
