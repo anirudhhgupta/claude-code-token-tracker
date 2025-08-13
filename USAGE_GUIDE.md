@@ -1,65 +1,5 @@
 # Claude Token Tracker - Complete Usage Guide
 
-## ✅ ONE-TIME SETUP CHECKLIST
-
-**Follow these exact steps once to set up fully automatic tracking:**
-
-### 📋 **Robust Tracker Setup** (RECOMMENDED)
-
-1. **Navigate to project directory:**
-   ```bash
-   cd /Users/anirudhgupta/Code/claude-token-tracker
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start robust tracker:**
-   ```bash
-   # Robust tracker with 500ms polling (recommended)
-   npm start
-   
-   # Or with debug output to see every change
-   npm run start-debug
-   ```
-
-4. **Verify tracking (in another terminal):**
-   ```bash
-   # Use Claude Code, then check if changes are detected
-   npm run report
-   ```
-
-**✅ ADVANTAGES of Robust Tracker:**
-- ⚡ **Never misses changes** - 500ms aggressive polling
-- 🔍 **Tracks everything** - All token types, costs, session endings
-- 🛡️ **Error recovery** - Continues through failures with detailed logging
-- 📊 **Real-time feedback** - See changes as they happen
-- 🎯 **100% reliable** - No race conditions or missed updates
-
----
-
-## ⚠️ **Legacy Tracker Issues** (Why you need the robust tracker)
-
-The original tracker (`tracker.js`) has these critical flaws:
-
-```bash
-# DON'T USE - Legacy tracker with known issues
-npm run start-legacy
-```
-
-**Problems with Legacy Tracker:**
-- ❌ **Misses session endings** - File watcher doesn't detect when you exit Claude
-- ❌ **Race conditions** - Changes can be missed due to file system timing
-- ❌ **Limited detection** - Only tracks input/output, ignores cache tokens
-- ❌ **No error recovery** - Fails silently without indication
-- ❌ **Unreliable on macOS** - File system events are inconsistent
-
-**Solution:** Always use the robust tracker with `npm start`
-
----
-
 ## 📖 Table of Contents
 1. [Quick Start](#quick-start)
 2. [Installation & Setup](#installation--setup)
@@ -74,35 +14,26 @@ npm run start-legacy
 
 ## 🚀 Quick Start
 
-**For first-time users:** Complete the [One-Time Setup Checklist](#-one-time-setup-checklist) above first.
-
-**For existing users:** Your tracker is already running automatically! Just use these commands:
-
+### 1. Install Dependencies
 ```bash
-# View overall usage summary
-claude-tokens summary
-
-# View recent sessions  
-claude-tokens recent
-
-# View daily statistics
-claude-tokens daily
-
-# View current project details
-claude-tokens project
-
-# Real-time monitoring (NEW!)
-claude-tokens monitor
-
-# Export usage data
-claude-tokens export
+cd claude-token-tracker
+npm install
 ```
 
-### 🔄 **How It Works After Setup**
-1. **Automatic Monitoring**: Service runs in background, no manual start needed
-2. **Real-time Tracking**: Monitors `~/.claude.json` for changes automatically  
-3. **Instant Reports**: Run any `claude-tokens` command anytime to see current stats
-4. **Boot Persistence**: Tracker automatically starts when you restart your Mac
+### 2. Start Monitoring
+```bash
+# Start the tracker (keeps running)
+npm start
+```
+
+### 3. View Your Usage
+```bash
+# Check overall summary
+npm run report
+
+# View recent sessions
+node src/reporter.js recent
+```
 
 ## 🛠 Installation & Setup
 
@@ -372,23 +303,6 @@ claude-tokens export
 claude-tokens export custom-filename.json
 ```
 
-#### **Real-Time Monitoring** (NEW!)
-```bash
-# Monitor all projects
-claude-tokens monitor
-
-# Monitor with custom polling interval
-claude-tokens monitor --interval 500
-claude-tokens monitor -i 2000
-
-# Monitor specific project only
-claude-tokens monitor --project "/path/to/project"
-claude-tokens monitor -p "/Users/anirudhgupta/Code/anushka-mock-interview"
-
-# Combined options
-claude-tokens monitor -p "/path/to/project" -i 1500
-```
-
 #### **Start Monitoring**
 ```bash
 claude-tokens start
@@ -462,7 +376,7 @@ CREATE TABLE session_snapshots (
 ### Background Monitoring
 ```bash
 # Start as daemon process
-nohup node src/tracker.js > /dev/null 2>&1 &
+t
 
 # Check if running
 ps aux | grep tracker.js
@@ -522,71 +436,44 @@ node src/reporter.js export backup-$(date +%Y%m%d).json
 
 ## 🔍 Troubleshooting
 
-### ⚠️ **Most Common Issue: Tracker Not Running**
+### Common Issues
 
-**Symptoms:**
-- Stats don't update despite active Claude Code usage
-- Cost remains the same across sessions
-- `claude-tokens summary` shows old data
-
-**Diagnosis:**
+#### **"No data found"**
 ```bash
-# Check if service is running
-launchctl list | grep claude
-
-# If no output, service is not running
-```
-
-**Fix:**
-```bash
-# Restart the service
-launchctl unload ~/Library/LaunchAgents/com.claude.tokentracker.plist
-launchctl load ~/Library/LaunchAgents/com.claude.tokentracker.plist
-
-# Or re-run setup
-./setup-auto-tracking.sh
-```
-
-### 🐛 **Other Common Issues**
-
-#### **"No data found" Error**
-```bash
-# Check if Claude Code config exists and has data
+# Check if Claude Code config exists
 ls -la ~/.claude.json
+
+# Verify you have active sessions
 cat ~/.claude.json | grep -A5 lastSessionId
 
-# Check service logs for errors
-tail -20 tracker.log
-tail -20 tracker-error.log
-```
-
-#### **Token Updates Delayed**
-- **Normal behavior**: Claude Code updates token counts periodically, not immediately
-- **Wait time**: Usually updates within 5-10 minutes or when session ends
-- **Workaround**: End your Claude Code session to force an update
-
-#### **Service Won't Start**
-```bash
-# Check Node.js path is correct
-which node
-
-# Update plist file with correct path
-./setup-auto-tracking.sh  # This will recreate with correct paths
-```
-
-#### **Database Permission Issues**
-```bash
-# Fix data directory permissions
-chmod -R 755 data/
-rm -f data/tokens.db  # Will recreate automatically
-```
-
-#### **Multiple Processes Running**
-```bash
-# Kill all tracker processes and restart service
+# Restart tracker to force initial processing
 pkill -f tracker.js
-launchctl unload ~/Library/LaunchAgents/com.claude.tokentracker.plist
-launchctl load ~/Library/LaunchAgents/com.claude.tokentracker.plist
+npm start
+```
+
+#### **Database Issues**
+```bash
+# Reset database
+rm -f data/tokens.db
+node src/tracker.js  # Will recreate automatically
+```
+
+#### **Permission Errors**
+```bash
+# Fix file permissions
+chmod 644 ~/.claude.json
+chmod +x src/cli.js
+chmod -R 755 data/
+```
+
+#### **Process Already Running**
+```bash
+# Find and kill existing processes
+ps aux | grep tracker.js
+kill <process_id>
+
+# Or kill all tracker processes
+pkill -f tracker.js
 ```
 
 ### Debug Mode

@@ -211,6 +211,20 @@ program
     reporter.close();
   });
 
+// Cost analysis
+program
+  .command('analyze-costs')
+  .description('Analyze costs to detect Sonnet vs Haiku model usage')
+  .action(async () => {
+    console.log(chalk.cyan('🔬 Running cost analysis to detect model switching...\n'));
+    const { CostAnalyzer } = await import('./cost-analyzer.js');
+    const analyzer = new CostAnalyzer();
+    analyzer.analyzeCostPatterns();
+    analyzer.analyzeRateLimitPatterns();
+    analyzer.checkForCostDrops();
+    analyzer.close();
+  });
+
 // Default command (show summary)
 if (process.argv.length === 2) {
   const reporter = new TokenReporter();
